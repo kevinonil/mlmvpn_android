@@ -120,32 +120,8 @@ object StoreManager {
         _rows.value = out
     }
 
-    /**
-     * The version of an engine built into the app. Xray says it itself (the library's
-     * `checkVersionX`), read once per app build; the other two are fixed by the build files.
-     */
-    private fun withAppVersion(context: Context, item: StoreItem): String? = when (item.id) {
-        "xray" -> {
-            val prefs = context.getSharedPreferences("store_prefs", Context.MODE_PRIVATE)
-            val code = runCatching {
-                val pi = context.packageManager.getPackageInfo(context.packageName, 0)
-                if (Build.VERSION.SDK_INT >= 28) pi.longVersionCode else @Suppress("DEPRECATION") pi.versionCode.toLong()
-            }.getOrDefault(0L)
-            val key = "withapp_xray_$code"
-            prefs.getString(key, null) ?: try {
-                val raw = libv2ray.Libv2ray.checkVersionX()
-                val v = Regex("Xray[- ]?core\\s+v?(\\d+\\.\\d+\\.\\d+)", RegexOption.IGNORE_CASE).find(raw)?.groupValues?.get(1)
-                    ?: Regex("v?(\\d+\\.\\d+\\.\\d+)").findAll(raw).lastOrNull()?.groupValues?.get(1)
-                v?.also { prefs.edit().putString(key, it).apply() }
-            } catch (t: Throwable) {
-                null
-            }
-        }
-        // app/libs/psiphontunnel-2.0.39-ns.aar and the amneziawg-android dependency in build.gradle.
-        "psiphon" -> "2.0.39"
-        "amneziawg" -> "2.1.13"
-        else -> null
-    }
+    /** No additional engine binaries are bundled in this two-engine build. */
+    private fun withAppVersion(context: Context, item: StoreItem): String? = null
 
     /** The code the app would deploy for a worker right now: the store's copy, else the shipped one. */
     private fun workerTarget(context: Context, item: StoreItem): String? =

@@ -389,23 +389,6 @@
                 tools:targetApi="34" />
         </service>
 
-        <!-- SoftEther SSL-VPN (vendored kittoku.mvc client, Apache-2.0). Brings up its own
-             tun through its own VpnService, exactly like AmneziaWG above, so MyVpnService
-             deliberately skips setupVpn() on this path. -->
-        <service
-            android:name="kittoku.mvc.service.SoftEtherVpnService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse"
-            android:permission="android.permission.BIND_VPN_SERVICE"
-            tools:targetApi="34">
-            <intent-filter>
-                <action android:name="android.net.VpnService" />
-            </intent-filter>
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Runs the SoftEther SSL-VPN tunnel"
-                tools:targetApi="34" />
-        </service>
 
         <!--
             Tun2proxyHostService: runs the tun2proxy native core, and NOTHING else, in its own

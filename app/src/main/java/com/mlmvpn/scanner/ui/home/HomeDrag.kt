@@ -663,14 +663,8 @@ internal fun Modifier.homeItemGestures(
         } else {
             when (val press = awaitTapOrHold(down)) {
                 is Press.Held -> {
-                    val held = item()
-                    if (fromFolder == null && held is BoardItem.App && held.app.id == com.mlmvpn.scanner.chat.MlmChat.TILE_ID) {
-                        // the Gereh tile's own menu; edit mode is one of its rows (GerehTileMenu)
-                        GerehTileMenu.open.value = true
-                    } else {
-                        onEnterEditMode()
-                        start(press.change.id, press.change.position)
-                    }
+                    onEnterEditMode()
+                    start(press.change.id, press.change.position)
                 }
                 Press.Tapped -> onTap()
                 Press.Cancelled -> Unit
