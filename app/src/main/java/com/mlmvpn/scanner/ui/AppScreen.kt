@@ -130,19 +130,6 @@ fun AppScreen() {
         }
     }
 
-    // A chat's card named a row of Settings (WidgetOpen.openSetting, q12): Settings on its page,
-    // the row lit, as when the home search finds it.
-    val externalSetting by com.mlmvpn.scanner.widget.WidgetOpen.pendingSetting.collectAsState()
-    val linkContext = androidx.compose.ui.platform.LocalContext.current
-    LaunchedEffect(externalSetting) {
-        val key = externalSetting ?: return@LaunchedEffect
-        com.mlmvpn.scanner.widget.WidgetOpen.pendingSetting.value = null
-        val entry = com.mlmvpn.scanner.data.GerehAppLinks.entryOf(linkContext, key) ?: return@LaunchedEffect
-        activeModal = null
-        settingsRoute = com.mlmvpn.scanner.ui.settings.SettingsIndex.prepare(linkContext, entry)
-        openTab("settings")
-    }
-
     // The update check still runs, and it no longer says anything.
     //
     // A dialog used to appear over whatever the user was doing the moment a new version was found.
@@ -670,12 +657,7 @@ fun AppScreen() {
                 trafficDown = trafficDown,
                 trafficUp = trafficUp,
                 onOpen = { app ->
-                    when {
-                        // «MLM CHAT» is the Telegram fork's own screen in the :chat process, not a tab.
-                        app.id == com.mlmvpn.scanner.chat.MlmChat.TILE_ID -> com.mlmvpn.scanner.chat.MlmChat.open(context)
-                        app.opensAsModal -> activeModal = app.id
-                        else -> openTab(app.id)
-                    }
+                    if (app.opensAsModal) activeModal = app.id else openTab(app.id)
                 },
                 onOpenUpdate = {
                     settingsRoute = com.mlmvpn.scanner.ui.settings.ROUTE_UPDATE_DOWNLOAD

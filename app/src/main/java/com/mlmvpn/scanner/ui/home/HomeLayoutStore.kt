@@ -58,19 +58,8 @@ object HomeLayoutStore {
     /** 4 columns x 6 rows. Past this the grid would need horizontal paging, which it has not got. */
     const val CAPACITY = 24
 
-    fun load(context: Context): List<BoardItem> = withoutRemoved(context, loadAll(context))
+    fun load(context: Context): List<BoardItem> = loadAll(context)
 
-    /** Gereh taken out of the app (q3): its tile is nowhere, as if the app never had it. */
-    private fun withoutRemoved(context: Context, items: List<BoardItem>): List<BoardItem> {
-        if (!com.mlmvpn.scanner.chat.MlmChat.removed(context)) return items
-        val gereh = com.mlmvpn.scanner.chat.MlmChat.TILE_ID
-        return items.mapNotNull { item ->
-            when (item) {
-                is BoardItem.App -> item.takeIf { it.id != gereh }
-                is BoardItem.Folder -> item.copy(apps = item.apps.filter { it.id != gereh }).takeIf { it.apps.isNotEmpty() }
-            }
-        }
-    }
 
     private fun loadAll(context: Context): List<BoardItem> {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)

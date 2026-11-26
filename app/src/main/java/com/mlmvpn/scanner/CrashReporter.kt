@@ -910,56 +910,6 @@ object CrashReporter {
         }
     }
 
-    /**
-     * MLM CHAT: the watchdog of the chat process (`:chat`). On Ehsan's S26 (27 Oct 2026) Telegram's
-     * storage queue stopped answering: every chat sat on its loading circle, and closing the app did
-     * not help, because Gereh's foreground service keeps the process alive. The watching itself
-     * (which queues, how long, the restart) is Gereh's bridge's now, for every app that carries it
-     * ([org.mlmvpn.chat.bridge.GerehWatchdog]); what a stall becomes is the app's: here a report like
-     * any freeze's, filed and sent ([reportChatStall]).
-     */
-    fun watchChatQueues(app: Application) {
-        org.mlmvpn.chat.bridge.GerehWatchdog.start(app, object : org.mlmvpn.chat.bridge.GerehWatchdog.Host {
-            override fun stalled(stalls: Array<org.mlmvpn.chat.bridge.GerehWatchdog.Stall>) {
-                stalls.forEach { runCatching { reportChatStall(it) } }
-            }
-
-            override fun stillStuck(stalls: Array<org.mlmvpn.chat.bridge.GerehWatchdog.Stall>) {
-                // filed at the first word (stalled); the bridge restarts the process now
-            }
-
-            override fun crashing(): Boolean = this@CrashReporter.crashing
-
-            override fun note(line: String) = this@CrashReporter.note(line)
-        })
-    }
-
-    private fun reportChatStall(s: org.mlmvpn.chat.bridge.GerehWatchdog.Stall) {
-        val text = buildString {
-            appendLine(CrashText.ANR_HEADER)
-            appendLine("error: freeze (chat ${s.queue} queue)" + (s.where?.let { " in $it" } ?: "") + ": it stopped answering")
-            appendLine("time      : ${Date()}")
-            appendLine("version   : $appVersion")
-            appendLine("device    : ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}, Android ${android.os.Build.VERSION.RELEASE}")
-            appendLine("stuck for : ${s.stuckMs} ms and counting")
-            appendLine("settings  : ${settingsLine()}")
-            appendLine("memory    : ${memoryLine()}")
-            appendLine()
-            appendLine("--- breadcrumbs (most recent last) ---")
-            synchronized(breadcrumbs) { breadcrumbs.forEach { appendLine(it) } }
-            appendLine()
-            // the stuck queue's whole stack, then every other thread's top (the bridge wrote both)
-            append(s.stack)
-            appendLine()
-            append(s.others)
-        }
-        Log.e(TAG, text)
-        val file = writeReport(text, tag = "freeze-chat-${s.queue}")
-        if (autoSend()) {
-            enqueue(file)
-            CrashUploadJob.schedule(appContext)
-        }
-    }
 
     /**
      * Hands the system a line to keep with this process: its version and the last thing it was

@@ -289,7 +289,6 @@ fun HomeScreen(
     // Leaving edit mode is what back does first, before it would ever offer to exit the app. An
     // open folder answers back itself (it closes, or leaves its own renaming first).
     BackHandler(enabled = editMode && openKey == null) { editMode = false }
-    GerehTileMenuDialog(onEditHome = { editMode = true }, onRemoved = { order = HomeLayoutStore.load(context) })
 
     val liveEngines = ActiveEngines.ids()
     val progress: State<Float> = folderProgress.asState()

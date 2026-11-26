@@ -2,15 +2,11 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'org.jetbrains.kotlin.plugin.compose'
-    // MLM CHAT: the Telegram fork's application-side build step (chat/build-logic): its strings as a
-    // hash-keyed asset table with stable ids, the string-id asset and lottie_meta.bin, which the
-    // fork's screens read at run time. It also takes this app's own strings into that table.
-    id 'org.telegram.build-app-plugin'
 }
 
 android {
     namespace 'com.mlmvpn.scanner'
-    // 36 for the Telegram fork's libraries (androidx.core 1.16+). targetSdk stays 34: it, not
+    // Compile against the current Android SDK. targetSdk stays 34: it, not
     // compileSdk, decides how Android treats the VPN services at run time.
     compileSdk 36
     buildToolsVersion "35.0.0"
@@ -44,13 +40,6 @@ android {
         jniLibs {
             useLegacyPackaging = true
         }
-    }
-
-    // MLM CHAT: the Telegram fork opens assets/emoji.pack with openFd(), which works only on an
-    // uncompressed asset; Telegram's own app module says the same. Without it the chat's process
-    // dies on the first screen that draws an emoji (New Contact, the QR code).
-    androidResources {
-        noCompress += "pack"
     }
 
     // No externalNativeBuild block, deliberately.
@@ -276,11 +265,9 @@ dependencies {
     // webkit-1.8.0.aar is left out while MLM CHAT is in the build: the Telegram fork brings
     // androidx.webkit 1.14.0 (a superset, ProxyController included), and two copies would be
     // duplicate classes.
-    implementation fileTree(dir: 'libs', include: ['*.aar'], exclude: ['webkit-1.8.0.aar'])
-    implementation 'androidx.webkit:webkit:1.14.0' // Proton's sign-in (ProxyController), same as the fork's
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    implementation 'androidx.webkit:webkit:1.14.0' // ProxyController for embedded sign-in pages
 
-    // MLM CHAT (PLAN 13, T4/T23): the Telegram Android fork, run in the :chat process.
-    implementation project(':TMessagesProj')
     
     // Unit tests. There were none before Config Studio; these two exist so that
     // ConfigBuilder's golden fixtures can run as a plain JVM test rather than needing an

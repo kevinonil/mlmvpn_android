@@ -265,14 +265,6 @@
             </intent-filter>
         </activity>
 
-        <!-- «انتقال» from a «گره» chat (n5): the configs go to their own sections here, in the main
-             process, then «open it?». Started from the chat's process over the chat, in its task, so
-             «stay» goes back to it. -->
-        <activity
-            android:name=".ui.GerehImportActivity"
-            android:exported="false"
-            android:excludeFromRecents="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!--
             WireguardScanService: legacy, hosts the old AmneziaWG-based WireGuard pipeline
@@ -667,11 +659,6 @@
         <receiver android:name=".widget.EmergencySniWidget" android:exported="true" android:label="@string/home_emergency_3">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_method_emergency_3" />
-        </receiver>
-        <!-- «گره»: unread count and network state, written by Gereh's bridge in :chat (GerehWidget.kt). -->
-        <receiver android:name=".widget.GerehWidget" android:exported="true" android:label="@string/home_mlmchat">
-            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_gereh" />
         </receiver>
 
         <receiver android:name=".widget.studio.StudioWidgetSmall" android:exported="true" android:label="@string/widget_studio_small">
